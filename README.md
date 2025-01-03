@@ -15,4 +15,4 @@ Here are some ideas to get you started:
 - ⚡ Fun fact: ...
 -->
 
-I like ruby, and solving the worlds problems.
+I like solving the worlds problems using ruby.
