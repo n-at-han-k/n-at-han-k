@@ -1,4 +1,4 @@
-## Hello 👋
+## 👋
 
 <!--
 **n-at-han-k/n-at-han-k** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
@@ -15,4 +15,4 @@ Here are some ideas to get you started:
 - ⚡ Fun fact: ...
 -->
 
-I like solving the world's problems using ruby.
+Solve problems using ruby.
