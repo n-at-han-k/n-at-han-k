@@ -22,8 +22,6 @@ Here are some ideas to get you started:
 ruby is our channel to the gods
 
 
-### Quick links
-
 - [concat.rb](https://github.com/n-at-han-k/concat.rb) - quickly concatenate files for llm input.
 - [clip.rb](https://github.com/n-at-han-k/) - pipe stdout into the clipboard (useful when used with concat.rb)
 - [string_builder](https://github.com/n-at-han-k/) - instantly create a ruby DSL for anything, cli or otherwise.
