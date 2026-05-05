@@ -31,3 +31,4 @@ ruby is our channel to the gods
 - [scampi](https://github.com/general-intelligence-systems/scampi) - micro test framework
 - [kube_schema](https://github.com/general-intelligence-systems/kube_schema) - build valid kubernetes objects with ruby
 - [kube_cluster](https://github.com/general-intelligence-systems/kube_cluster) - create kubernetes resources in ruby with the help of kube_schema
+- [agent2agent](https://github.com/general-intelligence-systems/agent2agent) - provides a client and a rack server for the agent2agent protocol
