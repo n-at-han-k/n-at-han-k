@@ -21,7 +21,7 @@ Here are some ideas to get you started:
 
 ruby is our channel to the gods
 
-
+## gems
 - [concat.rb](https://github.com/n-at-han-k/concat.rb) - quickly concatenate files for llm input.
 - [clip.rb](https://github.com/n-at-han-k/) - pipe stdout into the clipboard (useful when used with concat.rb)
 - [string_builder](https://github.com/n-at-han-k/) - instantly create a ruby DSL for anything, cli or otherwise.
@@ -32,3 +32,9 @@ ruby is our channel to the gods
 - [kube_schema](https://github.com/general-intelligence-systems/kube_schema) - build valid kubernetes objects with ruby
 - [kube_cluster](https://github.com/general-intelligence-systems/kube_cluster) - create kubernetes resources in ruby with the help of kube_schema
 - [agent2agent](https://github.com/general-intelligence-systems/agent2agent) - provides a client and a rack server for the agent2agent protocol
+
+## nix
+- [krew.nix](https://github.com/n-at-han-k/krew.nix) - every kubectl plugin in the krew-index, as a Nix flake
+
+## terraform
+- [terraform-provider-wso2](https://github.com/n-at-han-k/terraform-provider-wso2) - wso2 provider for creating and configuring tenants.
