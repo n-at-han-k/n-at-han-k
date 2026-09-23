@@ -38,3 +38,6 @@ ruby is our channel to the gods
 
 ## terraform
 - [terraform-provider-wso2](https://github.com/n-at-han-k/terraform-provider-wso2) - wso2 provider for creating and configuring tenants.
+
+## crossplane
+- [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod) - create runpod deployments with crossplane
