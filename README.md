@@ -1,4 +1,4 @@
-## it's coming home
+## ⚽ it's coming home
 
 <!--
 **n-at-han-k/n-at-han-k** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
@@ -21,7 +21,7 @@ Here are some ideas to get you started:
 
 ruby is our channel to the gods
 
-## gems
+## 💎 gems
 - [ratalada](https://github.com/n-at-han-k/ratalada) - create ruby servers as quickly as you can with javascript
 - [concat.rb](https://github.com/n-at-han-k/concat.rb) - quickly concatenate files for llm input.
 - [clip.rb](https://github.com/n-at-han-k/) - pipe stdout into the clipboard (useful when used with concat.rb)
@@ -34,21 +34,21 @@ ruby is our channel to the gods
 - [kube_cluster](https://github.com/general-intelligence-systems/kube_cluster) - create kubernetes resources in ruby with the help of kube_schema
 - [agent2agent](https://github.com/general-intelligence-systems/agent2agent) - provides a client and a rack server for the agent2agent protocol
 
-## nix
+## ❄️ nix
 - [krew.nix](https://github.com/n-at-han-k/krew.nix) - every kubectl plugin in the krew-index, as a Nix flake
 
-## terraform
+## 🏗️ terraform
 - [terraform-provider-wso2](https://github.com/n-at-han-k/terraform-provider-wso2)
 - [terraform-provider-rt](https://github.com/n-at-han-k/terraform-provider-rt)
 - [terraform-provider-orangehrm](https://github.com/n-at-han-k/terraform-provider-orangehrm) 
-## crossplane
+## ✈️ crossplane
 - [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod)
 - [crossplane-provider-rt](https://github.com/n-at-han-k/crossplane-provider-rt)
 - [crossplane-provider-orangehrm](https://github.com/n-at-han-k/crossplane-provider-orangehrm)
 
-## openapi
+## 📜 openapi
 - [openapi-schema-rt](https://github.com/n-at-han-k/openapi-schema-rt)
 - [openapi-schema-monzo](https://github.com/n-at-han-k/openapi-schema-monzo)
 
-## helm
+## ⛵ helm
 - [kubevirt-helm](https://github.com/general-intelligence-systems/kubevirt-helm)
