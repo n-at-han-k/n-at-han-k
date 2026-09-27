@@ -44,6 +44,6 @@ ruby is our channel to the gods
 - [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod) - create runpod deployments with crossplane
 - [crossplane-provider-rt](https://github.com/n-at-han-k/crossplane-provider-rt) - create request tracker resources
 
-## openapi schema
+## openapi
 - [openapi-schema-rt](https://github.com/n-at-han-k/openapi-schema-rt) - rt
 - [openapi-schema-monzo](https://github.com/n-at-han-k/openapi-schema-monzo) - monzo
