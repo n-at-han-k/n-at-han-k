@@ -38,12 +38,14 @@ ruby is our channel to the gods
 - [krew.nix](https://github.com/n-at-han-k/krew.nix) - every kubectl plugin in the krew-index, as a Nix flake
 
 ## terraform
-- [terraform-provider-wso2](https://github.com/n-at-han-k/terraform-provider-wso2) - wso2 provider for creating and configuring tenants.
-
+- [terraform-provider-wso2](https://github.com/n-at-han-k/terraform-provider-wso2)
+- [terraform-provider-rt](https://github.com/n-at-han-k/terraform-provider-rt)
+- [terraform-provider-orangehrm](https://github.com/n-at-han-k/terraform-provider-orangehrm) 
 ## crossplane
-- [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod) - create runpod deployments with crossplane
-- [crossplane-provider-rt](https://github.com/n-at-han-k/crossplane-provider-rt) - create request tracker resources
+- [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod)
+- [crossplane-provider-rt](https://github.com/n-at-han-k/crossplane-provider-rt)
+- [crossplane-provider-orangehrm](https://github.com/n-at-han-k/crossplane-provider-orangehrm)
 
 ## openapi
-- [openapi-schema-rt](https://github.com/n-at-han-k/openapi-schema-rt) - rt
-- [openapi-schema-monzo](https://github.com/n-at-han-k/openapi-schema-monzo) - monzo
+- [openapi-schema-rt](https://github.com/n-at-han-k/openapi-schema-rt)
+- [openapi-schema-monzo](https://github.com/n-at-han-k/openapi-schema-monzo)
