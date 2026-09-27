@@ -41,3 +41,7 @@ ruby is our channel to the gods
 
 ## crossplane
 - [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod) - create runpod deployments with crossplane
+- [crossplane-provider-rt](https://github.com/n-at-han-k/crossplane-provider-rt) - create request tracker resources
+
+## openapi schema
+- [openapi-schema-rt](https://github.com/n-at-han-k/openapi-schema-rt) - request tracker openapi
