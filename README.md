@@ -49,3 +49,6 @@ ruby is our channel to the gods
 ## openapi
 - [openapi-schema-rt](https://github.com/n-at-han-k/openapi-schema-rt)
 - [openapi-schema-monzo](https://github.com/n-at-han-k/openapi-schema-monzo)
+
+## helm
+- [kubevirt-helm](https://github.com/general-intelligence-systems/kubevirt-helm)
