@@ -40,11 +40,12 @@ ruby is our channel to the gods
 ## 🏗️ terraform
 - [terraform-provider-wso2](https://github.com/n-at-han-k/terraform-provider-wso2)
 - [terraform-provider-rt](https://github.com/n-at-han-k/terraform-provider-rt)
-- [terraform-provider-orangehrm](https://github.com/n-at-han-k/terraform-provider-orangehrm) 
+
 ## 🍡 crossplane
 - [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod)
 - [crossplane-provider-rt](https://github.com/n-at-han-k/crossplane-provider-rt)
 - [crossplane-provider-orangehrm](https://github.com/n-at-han-k/crossplane-provider-orangehrm)
+- [crossplane-provider-twilio](https://github.com/n-at-han-k/crossplane-provider-twilio)
 
 ## 📜 openapi
 - [openapi-schema-rt](https://github.com/n-at-han-k/openapi-schema-rt)
