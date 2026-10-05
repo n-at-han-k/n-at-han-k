@@ -40,6 +40,7 @@ ruby is our channel to the gods
 ## 🏗️ terraform
 - [terraform-provider-wso2](https://github.com/n-at-han-k/terraform-provider-wso2)
 - [terraform-provider-rt](https://github.com/n-at-han-k/terraform-provider-rt)
+- [terraform-provider-polar](https://github.com/n-at-han-k/terraform-provider-polar)
 
 ## 🍡 crossplane
 - [crossplane-provider-runpod](https://github.com/n-at-han-k/crossplane-provider-runpod)
