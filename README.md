@@ -24,8 +24,8 @@ ruby is our channel to the gods
 ## 💎 gems
 - [ratalada](https://github.com/n-at-han-k/ratalada) - create ruby servers as quickly as you can with javascript
 - [concat.rb](https://github.com/n-at-han-k/concat.rb) - quickly concatenate files for llm input.
-- [clip.rb](https://github.com/n-at-han-k/) - pipe stdout into the clipboard (useful when used with concat.rb)
-- [string_builder](https://github.com/n-at-han-k/) - instantly create a ruby DSL for anything, cli or otherwise.
+- [clip.rb](https://github.com/n-at-han-k/clip.rb) - pipe stdout into the clipboard (useful when used with concat.rb)
+- [string_builder](https://github.com/n-at-han-k/string_builder) - instantly create a ruby DSL for anything, cli or otherwise.
 - [colorize-extended](https://github.com/n-at-han-k/colorize-extended) - simple way of coloring terminal output
 - [gem_kit](https://github.com/n-at-han-k/gem_kit) - quickstart ruby gem template
 - [brute](https://github.com/general-intelligence-systems/brute) - llm agent framework using the rack middleware pattern
