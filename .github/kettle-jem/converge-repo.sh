@@ -119,7 +119,24 @@ for p in "${PROTECTED[@]}"; do
   git -C "$CLONE" checkout -- "$p" 2>/dev/null || true
 done
 
-# 5. Refuse to hand back a repo whose licence moved. A gem's licence is a
+# 5. Never touch CI, and enforce it here rather than ask for it. The config
+#    marks .github/workflows/** `keep_destination`, which is documented as
+#    "skip entirely — no merge, no creation", and kettle-jem wrote
+#    .github/workflows/gem-push.yml anyway: a release workflow that publishes
+#    to RubyGems on a tag, into a repo that never asked for one. The push was
+#    rejected for it ("refusing to allow a Personal Access Token to create or
+#    update workflow ... without `workflow` scope"), which is the right answer
+#    to the wrong change. A converge commit contains no workflow change at
+#    all, so the token needs no scope over CI.
+git -C "$CLONE" checkout -- .github/workflows 2>/dev/null || true
+git -C "$CLONE" clean -qfd .github/workflows 2>/dev/null || true
+if [ -n "$(git -C "$CLONE" status --porcelain -- .github/workflows)" ]; then
+  echo "::error::$REPO: the converge left .github/workflows modified" >&2
+  git -C "$CLONE" status --porcelain -- .github/workflows >&2
+  exit 1
+fi
+
+# 6. Refuse to hand back a repo whose licence moved. A gem's licence is a
 #    promise already made to whoever installed it; a template does not get to
 #    change it.
 if ! grep -q -- "$LICENSE" "$CLONE"/*.gemspec; then

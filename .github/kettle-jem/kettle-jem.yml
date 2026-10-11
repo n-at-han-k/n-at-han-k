@@ -129,6 +129,10 @@ patterns:
   # These repos have their own suites — async-matrix alone has eleven
   # workflows driving two homeservers — and replacing them silently turns a
   # green repo red. Adopt the generated CI per repo, deliberately.
+  # Both globs: `**` did not stop gem-push.yml being created, and the script
+  # removes any workflow change after the fact regardless.
+  - path: ".github/workflows/*"
+    strategy: keep_destination
   - path: ".github/workflows/**"
     strategy: keep_destination
 
