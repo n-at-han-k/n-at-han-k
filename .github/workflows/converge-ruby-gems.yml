@@ -79,12 +79,23 @@ jobs:
         run: |
           set -euo pipefail
 
-          # An empty repository reports a default branch that does not exist
-          # yet, and `git clone --branch ""` would be counted as a failure.
-          gh repo list "$OWNER" --limit 500 --no-archived --source \
-            --json name,defaultBranchRef \
-            --jq '.[] | select(.defaultBranchRef.name // "" != "") | [.name, .defaultBranchRef.name] | @tsv' \
-            > "$RUNNER_TEMP/all.tsv"
+          # REST, not `gh repo list`: that is GraphQL, and a fine-grained PAT
+          # that does not cover every repository answers with per-node errors
+          # ("Resource not accessible by personal access token
+          # (search.nodes.31.defaultBranchRef)") and a non-zero exit, which
+          # took the whole step down. REST returns what the token can see and
+          # says nothing about the rest.
+          #
+          # Two listings, because they answer different questions: the public
+          # repositories of this user, and everything this token is allowed to
+          # see, which is where a private gem comes from. An empty repository
+          # names a default branch that does not exist yet, and
+          # `git clone --branch ""` would be counted as a failure.
+          select='.[] | select(.fork == false and .archived == false and (.default_branch // "" != "") and (.size > 0)) | [.name, .default_branch] | @tsv'
+
+          gh api --paginate "users/$OWNER/repos?per_page=100&type=owner" --jq "$select" > "$RUNNER_TEMP/listed.tsv"
+          gh api --paginate "user/repos?per_page=100&affiliation=owner" --jq "$select" >> "$RUNNER_TEMP/listed.tsv" || true
+          sort -u "$RUNNER_TEMP/listed.tsv" > "$RUNNER_TEMP/all.tsv"
 
           : > "$RUNNER_TEMP/gems.tsv"
           while IFS=$'\t' read -r repo branch; do
