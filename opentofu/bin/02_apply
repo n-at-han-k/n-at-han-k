@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# 2/2: apply the plan, then throw the state away.
+#
+# This writes a commit to every repo in the plan. Read 01_plan's output first.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+tofu apply -input=false tfplan
+rm -f tfplan terraform.tfstate terraform.tfstate.backup

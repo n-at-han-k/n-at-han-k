@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# 1/2: fresh state, plan the funding files. Needs GITHUB_TOKEN.
+#
+# State is thrown away either side of a run, the same as the fork registry:
+# every resource here is derived from ../.github/repos.yml and GitHub itself,
+# so there is nothing in a state file worth keeping between runs.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+rm -f terraform.tfstate terraform.tfstate.backup tfplan
+tofu init -input=false
+tofu plan -input=false -out=tfplan

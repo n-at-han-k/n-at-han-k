@@ -1,0 +1,6 @@
+.direnv/
+# OpenTofu state is thrown away either side of every run — see opentofu/bin.
+opentofu/.terraform/
+opentofu/terraform.tfstate
+opentofu/terraform.tfstate.backup
+opentofu/tfplan
