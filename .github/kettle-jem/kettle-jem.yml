@@ -121,20 +121,17 @@ patterns:
   # spec.files and cert_chain is empty — but it must not land in 40 repos.
   - path: "certs/**"
     strategy: keep_destination
-  # The kettle-dev harness gemfiles pull dev-only third-party forks
+  # The modular gemfiles come with the CI: the generated workflows run the
+  # matrix out of gemfiles/modular, so keeping the one and not the other is a
+  # red suite. The cost is dev-only third-party forks in them
   # (pboling/rspec_junit_formatter, pboling/rubocop-packaging).
-  - path: "gemfiles/**"
-    strategy: keep_destination
-  # Generated kettle-dev CI assumes spec/ + rspec + appraisals + kettle-test.
-  # These repos have their own suites — async-matrix alone has eleven
-  # workflows driving two homeservers — and replacing them silently turns a
-  # green repo red. Adopt the generated CI per repo, deliberately.
-  # Both globs: `**` did not stop gem-push.yml being created, and the script
-  # removes any workflow change after the fact regardless.
-  - path: ".github/workflows/*"
-    strategy: keep_destination
-  - path: ".github/workflows/**"
-    strategy: keep_destination
+  # CI is the template's: no pattern here, so `.github/workflows/**` takes the
+  # default `merge`. kettle-jem's YAML merger gives the template every `uses:`
+  # line, which is how the action SHA pins stay current, and the destination
+  # every job key, so a matrix a repo has customised survives. Pushing these
+  # needs `workflow` scope (fine-grained: Workflows → Read and write) on the
+  # token, and the generated set includes gem-push.yml, which publishes to
+  # RubyGems on a tag.
 
 files:
   # Template boilerplate carrying the template author's own project links.
