@@ -37,9 +37,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      # Only the push job commits; a pull request from a fork gets read-only
-      # here regardless, which is why that path checks instead of writing.
-      contents: ${{ github.event_name == 'push' && 'write' || 'read' }}
+      # Static: `permissions` does not evaluate expressions, and a workflow
+      # that puts one here fails to parse before any step runs. Only the push
+      # path commits; on a pull request the job checks and writes nothing, and
+      # one from a fork is handed a read-only token whatever this says.
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
