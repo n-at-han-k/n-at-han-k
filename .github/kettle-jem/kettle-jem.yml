@@ -43,6 +43,9 @@ gemspec:
 licenses:
   - "{{LICENSE}}"
 
+# Open Collective stays off: the Open Collective account here (`nathan-k`) is a
+# personal profile, and only a Collective can actually receive money. Turning
+# this on would render a badge pointing at a page that cannot be donated to.
 funding:
   open_collective: false
 
@@ -105,10 +108,10 @@ tokens:
     orcid: ""
   funding:
     open_collective: false
-    kofi: ""
+    kofi: "n_at_han_k"
     paypal: ""
-    buymeacoffee: ""
-    liberapay: ""
+    buymeacoffee: "n.at.han.k"
+    liberapay: "n-at-han-k"
   social:
     mastodon: ""
     bluesky: ""

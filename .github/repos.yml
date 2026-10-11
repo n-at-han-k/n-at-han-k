@@ -1,0 +1,98 @@
+# The registry of n-at-han-k's public projects.
+#
+# This file is the single source for two things:
+#
+#   * README.md, which is rendered from it by .github/bin/render-readme.rb and
+#     regenerated in CI by .github/workflows/render-readme.yml. Do not edit
+#     README.md by hand — the workflow will overwrite it.
+#   * the set of repositories Converge Ruby gems works through, which used to
+#     be discovered from the API and so could only ever see one owner.
+#
+# A repo that is not listed here is not on the profile and is not converged.
+#
+# Keys per repo:
+#   repo         owner/name. The owner matters: these span two orgs, and the
+#                converge workflow clones, pushes and opens pull requests
+#                against whichever owner is named here.
+#   description  the trailing prose on the README line. Optional; omitted,
+#                the line is just the link, as the terraform and crossplane
+#                entries have always been.
+#   converge     overrides the section's setting for this one repo. Only
+#                `false` is meaningful: it keeps a repo on the profile page
+#                while holding it out of the converge run.
+#
+# Keys per section:
+#   title        the README H2, emoji included.
+#   converge     the template this section's repos are converged onto, or
+#                absent for none. Only `kettle-jem` is understood, and it
+#                still requires a gemspec at the repo root — the workflow
+#                checks, because being listed here is a statement of intent,
+#                not evidence of shape.
+
+title: "⚽ it's coming home"
+tagline: ruby is our channel to the gods
+
+sections:
+  - title: "💎 gems"
+    converge: kettle-jem
+    repos:
+      - repo: n-at-han-k/ratalada
+        description: create ruby servers as quickly as you can with javascript
+      - repo: n-at-han-k/concat.rb
+        description: quickly concatenate files for llm input.
+      - repo: n-at-han-k/clip.rb
+        description: pipe stdout into the clipboard (useful when used with concat.rb)
+      - repo: n-at-han-k/string_builder
+        description: instantly create a ruby DSL for anything, cli or otherwise.
+      - repo: n-at-han-k/colorize-extended
+        description: simple way of coloring terminal output
+      - repo: n-at-han-k/gem_kit
+        description: quickstart ruby gem template
+      # The general-intelligence-systems gems are listed here so that they
+      # appear on the profile page, but held out of the converge run for now.
+      # They have never been converged — the old API discovery was scoped to
+      # one owner and could not see them — so the first run against them is a
+      # separate decision, not a side effect of moving to a registry. Drop the
+      # `converge: false` line to bring one in.
+      - repo: general-intelligence-systems/brute
+        description: llm agent framework using the rack middleware pattern
+        converge: false
+      - repo: general-intelligence-systems/scampi
+        description: micro test framework
+        converge: false
+      - repo: general-intelligence-systems/kube_schema
+        description: build valid kubernetes objects with ruby
+        converge: false
+      - repo: general-intelligence-systems/kube_cluster
+        description: create kubernetes resources in ruby with the help of kube_schema
+        converge: false
+      - repo: general-intelligence-systems/agent2agent
+        description: provides a client and a rack server for the agent2agent protocol
+        converge: false
+
+  - title: "❄️ nix"
+    repos:
+      - repo: n-at-han-k/krew.nix
+        description: every kubectl plugin in the krew-index, as a Nix flake
+
+  - title: "🏗️ terraform"
+    repos:
+      - repo: n-at-han-k/terraform-provider-wso2
+      - repo: n-at-han-k/terraform-provider-rt
+      - repo: n-at-han-k/terraform-provider-polar
+
+  - title: "🍡 crossplane"
+    repos:
+      - repo: n-at-han-k/crossplane-provider-runpod
+      - repo: n-at-han-k/crossplane-provider-rt
+      - repo: n-at-han-k/crossplane-provider-orangehrm
+      - repo: n-at-han-k/crossplane-provider-twilio
+
+  - title: "📜 openapi"
+    repos:
+      - repo: n-at-han-k/openapi-schema-rt
+      - repo: n-at-han-k/openapi-schema-monzo
+
+  - title: "⛵ helm"
+    repos:
+      - repo: general-intelligence-systems/kubevirt-helm

@@ -1,0 +1,82 @@
+# README.md is rendered from .github/repos.yml, never written by hand.
+#
+# The same registry is what Converge Ruby gems reads, so the profile page and
+# the converge set cannot drift apart: adding a gem to the page is what puts
+# it in scope for the template.
+#
+# On main this commits the rendered README. On a pull request it only checks,
+# so that a branch which edits README.md directly fails rather than being
+# silently reverted on merge.
+name: Render README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/repos.yml"
+      - ".github/bin/render-readme.rb"
+      - ".github/workflows/render-readme.yml"
+      - "README.md"
+  pull_request:
+    paths:
+      - ".github/repos.yml"
+      - ".github/bin/render-readme.rb"
+      - ".github/workflows/render-readme.yml"
+      - "README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-readme-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      # Only the push job commits; a pull request from a fork gets read-only
+      # here regardless, which is why that path checks instead of writing.
+      contents: ${{ github.event_name == 'push' && 'write' || 'read' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The renderer is plain stdlib YAML — no bundle, no gems.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+
+      - name: Check README.md matches the registry
+        if: github.event_name != 'push'
+        run: ruby .github/bin/render-readme.rb --check
+
+      - name: Render and commit
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+
+          ruby .github/bin/render-readme.rb
+
+          if git diff --quiet -- README.md; then
+            echo "README.md was already up to date"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Render README.md from .github/repos.yml"
+
+          # The push retries once against a main that moved underneath it:
+          # this workflow also triggers on README.md, so two pushes in quick
+          # succession can race. --rebase is safe because the only thing this
+          # job commits is a file it regenerates from scratch.
+          if ! git push; then
+            git pull --rebase
+            ruby .github/bin/render-readme.rb
+            git add README.md
+            git diff --cached --quiet || git commit --amend --no-edit
+            git push
+          fi

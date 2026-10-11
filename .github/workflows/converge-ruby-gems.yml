@@ -2,16 +2,24 @@
 # and stays converged. Plain Actions, not gh-aw — the work is scripted and
 # there is no judgement in it.
 #
-# The same shape as ruby-gtk-project's Converge port gems, with two
-# differences: the repositories are discovered rather than read from a
-# registry, and the result is a pull request per repo rather than a push, so
-# that a template change to forty of my own projects is reviewed once per
-# project before it lands.
+# The same shape as ruby-gtk-project's Converge port gems: the repositories
+# come from a registry, and the result is a pull request per repo rather than
+# a push, so that a template change to forty of my own projects is reviewed
+# once per project before it lands.
 #
-# A repo is in scope when it is mine, not a fork, not archived, and has a
-# gemspec at its root — kettle-jem hard-fails without one. Each repo's licence
-# comes from GitHub, never from the template: Apache-2.0, MIT and LGPL-2.1 are
-# all in use here, and config_sync's default is MIT.
+# The registry is .github/repos.yml — the same file README.md is rendered
+# from, so the profile page and the converge set are one list and cannot
+# drift. It replaced API discovery, which was scoped to a single owner.
+#
+# A repo is in scope when it is listed under a `converge: kettle-jem` section,
+# is not marked `converge: false`, is not a fork, not archived, not empty, and
+# has a gemspec at its root — kettle-jem hard-fails without one. Each repo's
+# licence comes from GitHub, never from the template: Apache-2.0, MIT and
+# LGPL-2.1 are all in use here, and config_sync's default is MIT.
+#
+# The general-intelligence-systems gems are listed and opted out: discovery
+# never reached them, so converging them for the first time is its own
+# decision rather than a side effect of this change.
 name: Converge Ruby gems
 
 on:
@@ -20,7 +28,7 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: "Converge a single repo (name), blank = all"
+        description: "Converge a single repo (name or owner/name), blank = all"
         required: false
         type: string
       dry_run:
@@ -42,7 +50,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      OWNER: n-at-han-k
       BRANCH: kettle-jem/converge
     steps:
       - uses: actions/checkout@v4
@@ -70,8 +77,8 @@ jobs:
           BUNDLE_GEMFILE="$RUNNER_TEMP/kj/Gemfile" bundle exec kettle-jem version
 
       # The same token as the converge step, so that both see the same set of
-      # repositories: the built-in one is scoped to this repository, so it
-      # lists only my public repos, where the PAT also sees the private ones.
+      # repositories: the built-in one is scoped to this repository, so a
+      # private gem under either owner is invisible to it.
       - name: Find the gems
         env:
           GH_TOKEN: ${{ secrets.KETTLE_JEM_TOKEN || github.token }}
@@ -79,44 +86,78 @@ jobs:
         run: |
           set -euo pipefail
 
-          # REST, not `gh repo list`: that is GraphQL, and a fine-grained PAT
-          # that does not cover every repository answers with per-node errors
-          # ("Resource not accessible by personal access token
-          # (search.nodes.31.defaultBranchRef)") and a non-zero exit, which
-          # took the whole step down. REST returns what the token can see and
-          # says nothing about the rest.
+          # The registry, not the API. `gh repo list` is GraphQL and answers a
+          # partially-scoped PAT with per-node errors and a non-zero exit; the
+          # REST listing that replaced it could only ever name one owner, and
+          # these gems live under two. Reading the file settles both, and ties
+          # the converge set to the profile page's own list.
           #
-          # Two listings, because they answer different questions: the public
-          # repositories of this user, and everything this token is allowed to
-          # see, which is where a private gem comes from. An empty repository
-          # names a default branch that does not exist yet, and
-          # `git clone --branch ""` would be counted as a failure.
-          select='.[] | select(.fork == false and .archived == false and (.default_branch // "" != "") and (.size > 0)) | [.name, .default_branch] | @tsv'
+          # Being listed is a statement of intent, not evidence of shape, so
+          # every check below still runs.
+          ruby -ryaml -e '
+            data = YAML.safe_load_file(".github/repos.yml")
+            data.fetch("sections").each do |section|
+              next unless section["converge"] == "kettle-jem"
+              section.fetch("repos").each do |entry|
+                next if entry["converge"] == false
+                puts entry.fetch("repo")
+              end
+            end
+          ' > "$RUNNER_TEMP/registry.txt"
 
-          gh api --paginate "users/$OWNER/repos?per_page=100&type=owner" --jq "$select" > "$RUNNER_TEMP/listed.tsv"
-          gh api --paginate "user/repos?per_page=100&affiliation=owner" --jq "$select" >> "$RUNNER_TEMP/listed.tsv" || true
-          sort -u "$RUNNER_TEMP/listed.tsv" > "$RUNNER_TEMP/all.tsv"
+          echo "declared in .github/repos.yml: $(wc -l < "$RUNNER_TEMP/registry.txt") gems"
 
           : > "$RUNNER_TEMP/gems.tsv"
-          while IFS=$'\t' read -r repo branch; do
-            [ -n "$ONLY" ] && [ "$repo" != "$ONLY" ] && continue
+          while read -r slug; do
+            [ -n "$slug" ] || continue
+            owner=${slug%%/*}
+            repo=${slug#*/}
 
-            [ -z "$branch" ] && continue
+            # `only` takes the bare name or the full owner/name.
+            if [ -n "$ONLY" ] && [ "$ONLY" != "$slug" ] && [ "$ONLY" != "$repo" ]; then
+              continue
+            fi
 
-            # One API call per repo decides scope: a gemspec at the root.
-            # `gh api` prints the error body to stdout on a non-2xx — an empty
-            # repository answers 404 here — so the count is only believed when
-            # it is a number.
-            gemspec=$(gh api "repos/$OWNER/$repo/contents" \
+            # One call for the repo's own facts. `gh api` prints the error
+            # body to stdout on a non-2xx, so nothing is believed unless the
+            # call succeeded and the field parses. An empty repository names a
+            # default branch that does not exist yet, and `git clone --branch`
+            # on it would be counted as a failure.
+            if ! meta=$(gh api "repos/$slug" \
+              --jq '[.default_branch // "", .fork, .archived, .size, .license.spdx_id // "-"] | @tsv' 2>/dev/null); then
+              echo "::warning::$slug: not readable with this token, skipped"
+              continue
+            fi
+            IFS=$'\t' read -r branch fork archived size license <<< "$meta"
+
+            case "$size" in ''|*[!0-9]*) size=0 ;; esac
+            case "$license" in *[!A-Za-z0-9.+-]*|'') license="-" ;; esac
+
+            if [ "$fork" = "true" ]; then
+              echo "::notice::$slug: a fork, skipped"; continue
+            fi
+            if [ "$archived" = "true" ]; then
+              echo "::notice::$slug: archived, skipped"; continue
+            fi
+            if [ -z "$branch" ] || [ "$size" -eq 0 ]; then
+              echo "::notice::$slug: empty, skipped"; continue
+            fi
+
+            # kettle-jem hard-fails without a gemspec at the root.
+            gemspec=$(gh api "repos/$slug/contents" \
               --jq '[.[] | select(.type == "file" and (.name | endswith(".gemspec")))] | length' 2>/dev/null) || gemspec=0
             case "$gemspec" in ''|*[!0-9]*) gemspec=0 ;; esac
-            [ "$gemspec" -eq 0 ] && continue
+            if [ "$gemspec" -eq 0 ]; then
+              # Listed under a `converge: kettle-jem` section but not shaped
+              # like a gem. That is an error in the registry rather than in
+              # the repo, and silence would hide it: discovery would simply
+              # never have picked it up.
+              echo "::warning::$slug: listed as a gem but has no gemspec at its root"
+              continue
+            fi
 
-            # The licence is the project's, and it is not ours to invent.
-            license=$(gh api "repos/$OWNER/$repo" --jq '.license.spdx_id // "-"' 2>/dev/null) || license="-"
-            case "$license" in *[!A-Za-z0-9.+-]*|'') license="-" ;; esac
-            printf '%s\t%s\t%s\n' "$repo" "$branch" "$license" >> "$RUNNER_TEMP/gems.tsv"
-          done < "$RUNNER_TEMP/all.tsv"
+            printf '%s\t%s\t%s\t%s\n' "$owner" "$repo" "$branch" "$license" >> "$RUNNER_TEMP/gems.tsv"
+          done < "$RUNNER_TEMP/registry.txt"
 
           echo "in scope: $(wc -l < "$RUNNER_TEMP/gems.tsv") gems"
           cat "$RUNNER_TEMP/gems.tsv"
@@ -138,24 +179,25 @@ jobs:
 
           opened=(); updated=(); unchanged=(); unlicensed=(); converged=(); not_ready=(); failed=()
 
-          while IFS=$'\t' read -r repo branch license; do
+          while IFS=$'\t' read -r owner repo branch license; do
+            slug="$owner/$repo"
             if [ "$license" = "-" ] || [ "$license" = "NOASSERTION" ]; then
               # Not our error, and not something to guess: kettle-jem would
               # write MIT into it.
-              unlicensed+=("$repo"); continue
+              unlicensed+=("$slug"); continue
             fi
 
             tmp=$(mktemp -d)
-            if ! git clone --quiet --depth 1 --branch "$branch" "https://github.com/$OWNER/$repo" "$tmp/r"; then
-              failed+=("$repo (clone)"); rm -rf "$tmp"; continue
+            if ! git clone --quiet --depth 1 --branch "$branch" "https://github.com/$slug" "$tmp/r"; then
+              failed+=("$slug (clone)"); rm -rf "$tmp"; continue
             fi
 
             # Does it build before anything is touched? A gem that was
             # already failing to build is not evidence against the template,
             # and blaming it on this run would be a lie.
             if ! (cd "$tmp/r" && gem build ./*.gemspec >/dev/null 2>&1); then
-              echo "::notice::$repo: gem build was already failing before converging"
-              not_ready+=("$repo"); rm -rf "$tmp"; continue
+              echo "::notice::$slug: gem build was already failing before converging"
+              not_ready+=("$slug"); rm -rf "$tmp"; continue
             fi
             rm -f "$tmp/r"/*.gem
 
@@ -163,51 +205,51 @@ jobs:
             # `bash -e`, which `set -uo pipefail` does not undo, so a non-zero
             # exit from the script would kill the step before this check.
             rc=0
-            bundle exec .github/kettle-jem/converge-repo.sh "$tmp/r" "$repo" "$license" || rc=$?
+            bundle exec .github/kettle-jem/converge-repo.sh "$tmp/r" "$slug" "$license" || rc=$?
             # 3 is the repo's own shape, not our error: it needs a change
             # before kettle-jem can run on it at all, and the script has said
             # on the log which one.
             if [ "$rc" = "3" ]; then
-              not_ready+=("$repo"); rm -rf "$tmp"; continue
+              not_ready+=("$slug"); rm -rf "$tmp"; continue
             fi
             if [ "$rc" != "0" ]; then
-              failed+=("$repo (converge)"); rm -rf "$tmp"; continue
+              failed+=("$slug (converge)"); rm -rf "$tmp"; continue
             fi
 
             # It built before, so if it does not build now the template did
             # it, and that is ours.
             if ! (cd "$tmp/r" && gem build ./*.gemspec >/dev/null 2>&1); then
-              failed+=("$repo (gem build regressed)"); rm -rf "$tmp"; continue
+              failed+=("$slug (gem build regressed)"); rm -rf "$tmp"; continue
             fi
             rm -f "$tmp/r"/*.gem
 
             git -C "$tmp/r" add -A
             if git -C "$tmp/r" diff --cached --quiet; then
-              unchanged+=("$repo"); rm -rf "$tmp"; continue
+              unchanged+=("$slug"); rm -rf "$tmp"; continue
             fi
 
             if [ "$DRY_RUN" = "true" ] || [ "$HAS_PAT" != "true" ]; then
-              converged+=("$repo ($(git -C "$tmp/r" diff --cached --name-only | wc -l) files)")
+              converged+=("$slug ($(git -C "$tmp/r" diff --cached --name-only | wc -l) files)")
               rm -rf "$tmp"; continue
             fi
 
             git -C "$tmp/r" checkout -q -b "$BRANCH"
             if ! git -C "$tmp/r" commit -qm "Converge on the kettle-jem gem template" \
                || ! git -C "$tmp/r" push -q --force origin "$BRANCH"; then
-              failed+=("$repo (push)"); rm -rf "$tmp"; continue
+              failed+=("$slug (push)"); rm -rf "$tmp"; continue
             fi
 
             # Force-pushing the branch updates an open pull request in place,
             # so there is one per repo however many times this runs.
-            existing=$(gh api "repos/$OWNER/$repo/pulls?head=$OWNER:$BRANCH&state=open" --jq '.[0].number' 2>/dev/null)
+            existing=$(gh api "repos/$slug/pulls?head=$owner:$BRANCH&state=open" --jq '.[0].number' 2>/dev/null)
             if [ -n "$existing" ] && [ "$existing" != "null" ]; then
-              updated+=("$repo#$existing")
-            elif gh pr create -R "$OWNER/$repo" --base "$branch" --head "$BRANCH" \
+              updated+=("$slug#$existing")
+            elif gh pr create -R "$slug" --base "$branch" --head "$BRANCH" \
                  --title "Converge on the kettle-jem gem template" \
                  --body "$(printf 'Applied by [Converge Ruby gems](%s/%s/actions/runs/%s) in n-at-han-k/n-at-han-k, from the shared config in `.github/kettle-jem/`.\n\nThe licence (`%s`) and the gemspec Ruby floor are pinned from this repo, not derived — kettle-jem defaults to MIT. The repo keeps its own README, CHANGELOG, AGENTS.md, .rubocop.yml, flake.nix and `.github/workflows/`; see the config for why each one is `keep_destination`.\n\n`gem build` was run against the result before this was opened.' "${{ github.server_url }}" "${{ github.repository }}" "${{ github.run_id }}" "$license")" >/dev/null; then
-              opened+=("$repo")
+              opened+=("$slug")
             else
-              failed+=("$repo (pull request)")
+              failed+=("$slug (pull request)")
             fi
             rm -rf "$tmp"
           done < "$RUNNER_TEMP/gems.tsv"
