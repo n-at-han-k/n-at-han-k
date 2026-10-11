@@ -10,8 +10,13 @@
 # where every comment below was paid for.
 #
 # Exit 0 converged, 1 something went wrong that needs fixing, 3 the repo is not
-# ready for kettle-jem and needs a change of its own first. 3 is not a failure:
-# it is a finding, and the workflow reports it per repo.
+# ready for kettle-jem and needs a change of its own first.
+#
+# 3 is not a failure: it is a finding, and the workflow reports it per repo.
+# What is ours is this script and the shared config; the state of forty-odd
+# gemspecs is not, and a gemspec kettle-jem cannot read is a fact about that
+# repo. 1 is reserved for the cases that mean the config is wrong — a licence
+# that moved, a licence file that should not be there.
 #
 # kettle-jem needs Ruby >= 4.0 and a bundle pinning prism 1.9.0: it declares
 # `prism >= 1.6.0` but calls Prism::Node#breadth_first_search_all, which only
@@ -50,8 +55,8 @@ min_ruby=$(cd "$CLONE" && ruby -rrubygems -e '
   print(m || "")
 ' 2>/dev/null)
 if [ -z "$min_ruby" ]; then
-  echo "::error::$REPO gemspec declares no required_ruby_version" >&2
-  exit 1
+  echo "::notice::$REPO: gemspec declares no required_ruby_version — kettle-jem writes the floor from config, so the project has to state one"
+  exit 3
 fi
 
 # kettle-jem rewrites its own config, the README and the CHANGELOG on every run
@@ -101,9 +106,12 @@ if ! kettle-jem apply "$CLONE" --accept --skip-commit --quiet --no-changelog > "
     echo "::notice::$REPO: gemspec spec.files is not a shape kettle-jem can merge — rewrite it as an Array literal or Dir[], or remove it and let kettle-jem own it"
     exit 3
   fi
-  echo "::error::$REPO: kettle-jem apply failed" >&2
-  sed 's/^/  /' "$log" >&2
-  exit 1
+  # Anything else apply refuses is also about this repo — a gemspec that
+  # `require`s a file no bare checkout can load is the common one — so report
+  # the reason rather than claiming the run broke.
+  echo "::notice::$REPO: kettle-jem apply refused this repo"
+  sed 's/^/  /' "$log"
+  exit 3
 fi
 
 # 4. Re-assert the recipe-owned paths.

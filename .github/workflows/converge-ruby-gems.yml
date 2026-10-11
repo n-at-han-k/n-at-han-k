@@ -139,6 +139,15 @@ jobs:
               failed+=("$repo (clone)"); rm -rf "$tmp"; continue
             fi
 
+            # Does it build before anything is touched? A gem that was
+            # already failing to build is not evidence against the template,
+            # and blaming it on this run would be a lie.
+            if ! (cd "$tmp/r" && gem build ./*.gemspec >/dev/null 2>&1); then
+              echo "::notice::$repo: gem build was already failing before converging"
+              not_ready+=("$repo"); rm -rf "$tmp"; continue
+            fi
+            rm -f "$tmp/r"/*.gem
+
             # `|| rc=$?` and not a bare call: the default step shell is
             # `bash -e`, which `set -uo pipefail` does not undo, so a non-zero
             # exit from the script would kill the step before this check.
@@ -154,9 +163,10 @@ jobs:
               failed+=("$repo (converge)"); rm -rf "$tmp"; continue
             fi
 
-            # A gem that converges but no longer builds has not been helped.
+            # It built before, so if it does not build now the template did
+            # it, and that is ours.
             if ! (cd "$tmp/r" && gem build ./*.gemspec >/dev/null 2>&1); then
-              failed+=("$repo (gem build)"); rm -rf "$tmp"; continue
+              failed+=("$repo (gem build regressed)"); rm -rf "$tmp"; continue
             fi
             rm -f "$tmp/r"/*.gem
 
@@ -213,9 +223,11 @@ jobs:
               echo "> A repo with no SPDX licence is skipped rather than guessed: kettle-jem's default is MIT."
             fi
             if [ ${#not_ready[@]} -gt 0 ]; then
-              echo "> \"Not ready\" is a gemspec whose \`spec.files\` kettle-jem cannot merge — an"
-              echo "> Array literal, a \`Dir[]\` call or no assignment at all are the shapes it takes."
-              echo "> The run log names each one."
+              echo "> \"Not ready\" is this repo's own shape, not a failure of the run: a"
+              echo "> \`spec.files\` kettle-jem cannot merge (it takes an Array literal, a \`Dir[]\`"
+              echo "> call, or no assignment at all), a gemspec with no \`required_ruby_version\`,"
+              echo "> one that cannot be loaded outside its own bundle, or a gem that was already"
+              echo "> failing to build. The run log names the reason for each."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -227,7 +239,9 @@ jobs:
             exit 1
           fi
           # Green with nothing is the worst outcome: name the success states.
-          if [ $((${#opened[@]} + ${#updated[@]} + ${#unchanged[@]} + ${#converged[@]} + ${#not_ready[@]})) -eq 0 ]; then
+          # Findings do not count — a broken shared config would turn every
+          # repo into one, and that must not read as a successful run.
+          if [ $((${#opened[@]} + ${#updated[@]} + ${#unchanged[@]} + ${#converged[@]})) -eq 0 ]; then
             echo "::error::no gem was converged and none was already converged"
             exit 1
           fi
