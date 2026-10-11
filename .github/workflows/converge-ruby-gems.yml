@@ -125,7 +125,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          opened=(); updated=(); unchanged=(); unlicensed=(); converged=(); failed=()
+          opened=(); updated=(); unchanged=(); unlicensed=(); converged=(); not_ready=(); failed=()
 
           while IFS=$'\t' read -r repo branch license; do
             if [ "$license" = "-" ] || [ "$license" = "NOASSERTION" ]; then
@@ -144,6 +144,12 @@ jobs:
             # exit from the script would kill the step before this check.
             rc=0
             bundle exec .github/kettle-jem/converge-repo.sh "$tmp/r" "$repo" "$license" || rc=$?
+            # 3 is the repo's own shape, not our error: it needs a change
+            # before kettle-jem can run on it at all, and the script has said
+            # on the log which one.
+            if [ "$rc" = "3" ]; then
+              not_ready+=("$repo"); rm -rf "$tmp"; continue
+            fi
             if [ "$rc" != "0" ]; then
               failed+=("$repo (converge)"); rm -rf "$tmp"; continue
             fi
@@ -195,6 +201,7 @@ jobs:
             echo "| already converged | ${#unchanged[@]} | ${unchanged[*]-} |"
             echo "| converged, not opened | ${#converged[@]} | ${converged[*]-} |"
             echo "| no licence | ${#unlicensed[@]} | ${unlicensed[*]-} |"
+            echo "| not ready for kettle-jem | ${#not_ready[@]} | ${not_ready[*]-} |"
             echo "| failed | ${#failed[@]} | ${failed[*]-} |"
             echo
             if [ "$HAS_PAT" != "true" ]; then
@@ -202,7 +209,14 @@ jobs:
               echo "> \`contents: write\` and \`pull_requests: write\` on these repos to open the"
               echo "> pull requests."
             fi
-            [ ${#unlicensed[@]} -gt 0 ] && echo "> A repo with no SPDX licence is skipped rather than guessed: kettle-jem's default is MIT."
+            if [ ${#unlicensed[@]} -gt 0 ]; then
+              echo "> A repo with no SPDX licence is skipped rather than guessed: kettle-jem's default is MIT."
+            fi
+            if [ ${#not_ready[@]} -gt 0 ]; then
+              echo "> \"Not ready\" is a gemspec whose \`spec.files\` kettle-jem cannot merge — an"
+              echo "> Array literal, a \`Dir[]\` call or no assignment at all are the shapes it takes."
+              echo "> The run log names each one."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
           # Fail loudly on errors in our own work. A repo with no licence is
@@ -213,7 +227,7 @@ jobs:
             exit 1
           fi
           # Green with nothing is the worst outcome: name the success states.
-          if [ $((${#opened[@]} + ${#updated[@]} + ${#unchanged[@]} + ${#converged[@]})) -eq 0 ]; then
+          if [ $((${#opened[@]} + ${#updated[@]} + ${#unchanged[@]} + ${#converged[@]} + ${#not_ready[@]})) -eq 0 ]; then
             echo "::error::no gem was converged and none was already converged"
             exit 1
           fi

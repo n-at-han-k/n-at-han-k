@@ -7,7 +7,11 @@
 # branch. Writes to the clone only — the workflow owns the commit, push and PR.
 #
 # Modelled on ruby-gtk-project's .github/aw/converge-port-gem.sh, which is
-# where every comment below was paid for. Exit 0 converged, 1 needs fixing.
+# where every comment below was paid for.
+#
+# Exit 0 converged, 1 something went wrong that needs fixing, 3 the repo is not
+# ready for kettle-jem and needs a change of its own first. 3 is not a failure:
+# it is a finding, and the workflow reports it per repo.
 #
 # kettle-jem needs Ruby >= 4.0 and a bundle pinning prism 1.9.0: it declares
 # `prism >= 1.6.0` but calls Prism::Node#breadth_first_search_all, which only
@@ -82,8 +86,23 @@ done
 
 # 3. Converge. --no-changelog: without it kettle-jem appends its own template
 #    changelog entries into the project's CHANGELOG on every run.
-if ! kettle-jem apply "$CLONE" --accept --skip-commit --quiet --no-changelog; then
+#
+#    --quiet swallows the reason along with the noise, so capture it: a run
+#    that reports "apply failed" and nothing else cannot be acted on.
+log=$(mktemp)
+if ! kettle-jem apply "$CLONE" --accept --skip-commit --quiet --no-changelog > "$log" 2>&1; then
+  # kettle-jem merges spec.files only as an Array literal, a Dir[] call, or a
+  # known Bundler git-ls-files assignment, and inserts its own canonical
+  # assignment when there is none at all. Anything else — async-matrix's
+  # `Dir.glob([...], File::FNM_DOTMATCH, base: __dir__)`, for one — stops it
+  # dead. Rewriting it here would change what the gem ships, which is the
+  # author's call and not a template's, so this is reported, not fixed.
+  if grep -q "Unsupported gemspec spec.files assignment" "$log"; then
+    echo "::notice::$REPO: gemspec spec.files is not a shape kettle-jem can merge — rewrite it as an Array literal or Dir[], or remove it and let kettle-jem own it"
+    exit 3
+  fi
   echo "::error::$REPO: kettle-jem apply failed" >&2
+  sed 's/^/  /' "$log" >&2
   exit 1
 fi
 
