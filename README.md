@@ -4,6 +4,7 @@ ruby is our channel to the gods
 
 ## 💎 gems
 - [ratalada](https://github.com/n-at-han-k/ratalada) - create ruby servers as quickly as you can with javascript
+- [vodozemac](https://github.com/n-at-han-k/vodozemac) - rust bindings for vodozemac encryption
 - [concat.rb](https://github.com/n-at-han-k/concat.rb) - quickly concatenate files for llm input.
 - [clip.rb](https://github.com/n-at-han-k/clip.rb) - pipe stdout into the clipboard (useful when used with concat.rb)
 - [string_builder](https://github.com/n-at-han-k/string_builder) - instantly create a ruby DSL for anything, cli or otherwise.
