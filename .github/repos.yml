@@ -38,7 +38,7 @@ sections:
     repos:
       - repo: n-at-han-k/ratalada
         description: create ruby servers as quickly as you can with javascript
-      - repo: n-at-han-k/vodozemac
+      - repo: n-at-han-k/vodozemac-rb
         description: rust bindings for vodozemac encryption
       - repo: n-at-han-k/concat.rb
         description: quickly concatenate files for llm input.
