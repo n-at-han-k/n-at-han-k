@@ -42,6 +42,12 @@ sections:
         description: rust bindings for vodozemac encryption
       - repo: n-at-han-k/concat.rb
         description: quickly concatenate files for llm input.
+      - repo: n-at-han-k/hey.rb
+        description: stress test with async http
+      - repo: n-at-han-k/async-vikunja
+        description: vikunja async REST client
+      - repo: n-at-han-k/async-firefly
+        description: firefly-iii async REST client
       - repo: n-at-han-k/clip.rb
         description: pipe stdout into the clipboard (useful when used with concat.rb)
       - repo: n-at-han-k/string_builder
