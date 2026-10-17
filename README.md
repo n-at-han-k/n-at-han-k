@@ -6,6 +6,9 @@ ruby is our channel to the gods
 - [ratalada](https://github.com/n-at-han-k/ratalada) - create ruby servers as quickly as you can with javascript
 - [vodozemac-rb](https://github.com/n-at-han-k/vodozemac-rb) - rust bindings for vodozemac encryption
 - [concat.rb](https://github.com/n-at-han-k/concat.rb) - quickly concatenate files for llm input.
+- [hey.rb](https://github.com/n-at-han-k/hey.rb) - stress test with async http
+- [async-vikunja](https://github.com/n-at-han-k/async-vikunja) - vikunja async REST client
+- [async-firefly](https://github.com/n-at-han-k/async-firefly) - firefly-iii async REST client
 - [clip.rb](https://github.com/n-at-han-k/clip.rb) - pipe stdout into the clipboard (useful when used with concat.rb)
 - [string_builder](https://github.com/n-at-han-k/string_builder) - instantly create a ruby DSL for anything, cli or otherwise.
 - [colorize-extended](https://github.com/n-at-han-k/colorize-extended) - simple way of coloring terminal output
