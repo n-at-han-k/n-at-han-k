@@ -77,6 +77,12 @@ sections:
       - repo: general-intelligence-systems/agent2agent
         description: provides a client and a rack server for the agent2agent protocol
         converge: false
+      - repo: general-intelligence-systems/async-matrix
+        description:
+        converge: false
+      - repo: general-intelligence-systems/async-matrix-bridge
+        description:
+        converge: false
 
   - title: "❄️ nix"
     repos:
