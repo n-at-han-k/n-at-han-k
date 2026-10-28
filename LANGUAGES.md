@@ -17,3 +17,8 @@ Languages I've worked with so far:
 - [ ] awk
 - [x] bash/zsh/posix
 - [ ] elixr
+- [ ] erlang
+- [ ] ocaml
+- [ ] perl
+- [x] nix
+- [ ] zig
