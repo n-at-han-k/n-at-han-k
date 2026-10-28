@@ -13,3 +13,8 @@ Languages I've worked with so far:
 - [x] java
 - [x] kotlin
 - [x] swift
+- [x] SQL
+- [-] awk
+- [x] bash/zsh/posix
+- [-] elixr
+- [ ] 
