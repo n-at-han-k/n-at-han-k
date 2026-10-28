@@ -14,7 +14,6 @@ Languages I've worked with so far:
 - [x] kotlin
 - [x] swift
 - [x] SQL
-- [-] awk
+- [ ] awk
 - [x] bash/zsh/posix
-- [-] elixr
-- [ ] 
+- [ ] elixr
