@@ -28,6 +28,12 @@
 #                still requires a gemspec at the repo root — the workflow
 #                checks, because being listed here is a statement of intent,
 #                not evidence of shape.
+#
+# The gnome bindings section names no template deliberately. Those gems are
+# all one shape already: a GObjectIntrospection::Loader over one typelib, a
+# flake pinning that typelib, and a suite that runs inside it. Converging them
+# onto kettle-jem would reshape thirty repos as a side effect of listing them.
+# Add `converge: kettle-jem` to that section when that is what you want.
 
 title: "⚽ it's coming home"
 tagline: ruby is our channel to the gods
@@ -84,6 +90,68 @@ sections:
         description:
         converge: false
 
+  - title: "🧬 gnome bindings"
+    repos:
+      - repo: n-at-han-k/soup3-rb
+        description: libsoup 3, the GNOME HTTP library
+      - repo: n-at-han-k/glycin-rb
+        description: glycin, sandboxed image loading
+      - repo: n-at-han-k/libglycin-gtk4-rb
+        description: the GTK4 side of glycin, decoded image to GdkTexture
+      - repo: n-at-han-k/gstreamer-pbutils-rb
+        description: GStreamer base utils, discoverer and encoding profiles
+      - repo: n-at-han-k/gstreamer-play-rb
+        description: the GStreamer Play API, a playback pipeline
+      - repo: n-at-han-k/libspelling-rb
+        description: spell checking for GtkSourceView 5
+      - repo: n-at-han-k/libgweather-rb
+        description: locations and weather reports
+      - repo: n-at-han-k/libshumate-rb
+        description: the GTK4 map widget
+      - repo: n-at-han-k/gnome-desktop-rb
+        description: thumbnails, idle monitoring and desktop metadata
+      - repo: n-at-han-k/goa-rb
+        description: GNOME Online Accounts
+      - repo: n-at-han-k/flatpak-rb
+        description: libflatpak, installations, remotes and refs
+      - repo: n-at-han-k/polkit-rb
+        description: polkit, may this process do a privileged thing
+      - repo: n-at-han-k/gudev-rb
+        description: GUdev, device enumeration over libudev
+      - repo: n-at-han-k/gcr-rb
+        description: GCR and GCK, certificates, keys and PKCS#11
+      - repo: n-at-han-k/tsparql-rb
+        description: TinySPARQL and Tracker, the RDF store GNOME indexes with
+      - repo: n-at-han-k/edataserver-rb
+        description: Evolution Data Server, shared address books and calendars
+      - repo: n-at-han-k/libgtop-rb
+        description: libgtop, process and system statistics
+      - repo: n-at-han-k/geocode-glib-rb
+        description: geocode-glib, forward and reverse geocoding
+      - repo: n-at-han-k/udisks-rb
+        description: UDisks, block devices over D-Bus
+      - repo: n-at-han-k/appstream-rb
+        description: AppStream, the software metadata catalogue
+      - repo: n-at-han-k/colord-rb
+        description: colord, colour devices and ICC profiles
+      - repo: n-at-han-k/ibus-rb
+        description: IBus, the input method framework
+      - repo: n-at-han-k/packagekit-glib-rb
+        description: PackageKit, package management over D-Bus
+      - repo: n-at-han-k/webkit-web-process-extension-rb
+        description: the WebKit 6.0 web process extension API
+      - repo: n-at-han-k/libcloudproviders-rb
+        description: libcloudproviders, a storage provider for a file manager
+      - repo: n-at-han-k/gnome-autoar-rb
+        description: gnome-autoar, extracting and compressing archives
+      - repo: n-at-han-k/grilo-rb
+        description: Grilo, browsing and searching media sources
+      - repo: n-at-han-k/libmediaart-rb
+        description: libmediaart, locating and caching album art
+      - repo: n-at-han-k/librest-rb
+        description: librest, RESTful calls with OAuth and PKCE signing
+      - repo: n-at-han-k/upower-glib-rb
+        description: UPower, battery and power device state
   - title: "❄️ nix"
     repos:
       - repo: n-at-han-k/krew.nix
