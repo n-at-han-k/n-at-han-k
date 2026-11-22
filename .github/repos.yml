@@ -35,8 +35,11 @@
 # onto kettle-jem would reshape thirty repos as a side effect of listing them.
 # Add `converge: kettle-jem` to that section when that is what you want.
 
-title: "⚽ it's coming home"
-tagline: ruby is our channel to the gods
+title: "mad world"
+tagline: |
+  I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it.
+  
+  -- Billy Gates, the g.
 
 sections:
   - title: "💎 gems"
