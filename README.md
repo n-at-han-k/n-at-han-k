@@ -1,7 +1,6 @@
-## [w]hat a [w]ild [w]orld
+## ⚽ it's coming home
 
-> I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it.
-> -- Billy Gates, the G.
+ruby is our channel to the gods
 
 ## 💎 gems
 - [ratalada](https://github.com/n-at-han-k/ratalada) - create ruby servers as quickly as you can with javascript
